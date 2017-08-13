@@ -86,19 +86,23 @@ println("2.Введите id одной из групп для поиска: ")
 sql.eachRow("select * from groups g "){result ->
     Integer res = result.groups_id
     listGroup.add(res)
-    println("id=" + result.groups_id + "группа=" + result.groups_name)
-   // println("id=${it.groups_id} группа=${it.groups_name}")
+    println("id= " + result.groups_id + " группа=" + result.groups_name)
 }
 def group_id = reader.readLine();
-sql.eachRow("select * from user u, groups g where u.groups_id=g.groups_id and u.groups_id=? order by userId", [group_id]) {
-    println("${it.userId}.${it.lastname} ${it.name} ${it.midlename} ${it.birthday} ${it.login} ${it.groups_name} ${it.status} ")
+sql.eachRow("select * from user u, groups g where u.groups_id=g.groups_id and u.groups_id=? order by userId", [group_id]) {result ->
+    def stat = (result.status==1)?"актвивен":"нет"
+    println(result.userId + "." + result.lastname + " " + result.name + " "
+            + result.midlename + " " + result.birthday + " " + result.login + " " + result.groups_name + " " + stat)
 }
 
 
+println()
 println("2.Введите статус человека для поиска(1-активен, 0 - нет): ")
 def status = reader.readLine();
-sql.eachRow("select * from user u, groups g where u.groups_id=g.groups_id and u.status=? order by userId", [status]) {
-    println("${it.userId}.${it.lastname} ${it.name} ${it.midlename} ${it.birthday} ${it.login} ${it.groups_name} ${it.status} ")
+sql.eachRow("select * from user u, groups g where u.groups_id=g.groups_id and u.status=? order by userId", [status]) {result ->
+    def stat = (result.status==1)?"актвивен":"нет"
+    println(result.userId + "." + result.lastname + " " + result.name + " "
+            + result.midlename + " " + result.birthday + " " + result.login + " " + result.groups_name + " " + stat)
 }
 
 
@@ -115,9 +119,10 @@ sql.eachRow("select * from user u, groups g where u.groups_id=g.groups_id order 
     while(resultSet.next()){
         String res = resultSet.birthday
         Integer r = Integer.parseInt(res.substring(5,7))
+        def stat = (resultSet.status==1)?"актвивен":"нет"
         (((cal.get(Calendar.MONTH)-2) < r)&(r < (cal.get(Calendar.MONTH)+1)))?println(resultSet.userId + "."
                 + resultSet.lastname + " " + resultSet.name+ " "+resultSet.midlename+ " "+resultSet.birthday+ " "
-                +resultSet.login+ " "+resultSet.groups_name+ " "+resultSet.status):null
+                +resultSet.login+ " "+resultSet.groups_name+ " "+ stat):null
     }
 }
 
@@ -147,8 +152,10 @@ sql.execute("delete from user where userId = ?" , [userId])
 
 println()
 println("7.Список всех сотрудников:  ")
-sql.eachRow("select * from user u, groups g where u.groups_id=g.groups_id order by userId") {
-    println("${it.userId}.${it.lastname} ${it.name} ${it.midlename} ${it.birthday} ${it.login} ${it.groups_name} ${it.status} ")
+sql.eachRow("select * from user u, groups g where u.groups_id=g.groups_id order by userId") { result ->
+    def stat = (result.status==1)?"актвивен":"нет"
+    println(result.userId + "." + result.lastname + " " + result.name + " "
+            + result.midlename + " " + result.birthday + " " + result.login + " " + result.groups_name + " " + stat)
 }
 
 sql.close()
